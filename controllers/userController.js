@@ -1,6 +1,7 @@
 import { User } from "../models/userModel.js";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'
+import { userSocketMap } from "../socket/socket.js";
 
 export const register = async (req, res) => {
     try {
@@ -88,6 +89,47 @@ export const register = async (req, res) => {
       console.log(error, "login api error");
     }
   };
+
+  export const userProfile = async (req,res)=>{
+    try {
+      const userId = req.id
+      const user = await User.findById(userId).select("-password")
+      if(!user){
+        return res.status(404).json({success:true,message:"User Not Found"})
+      }
+
+      return res.status(200).json({success:true,message:"Profile Get",user})
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({success:false,message:"Server Not working"})
+    }
+  }
+
+  export const editUser=async(req,res)=>{
+    try {
+      const userId = req.id
+
+      if(!userId){
+        return res.status(400).json({success:false,message:"user not authorized"})
+      }
+      const {name,email,role,phone} = req.body
+
+      const updatedUser = await User.findByIdAndUpdate(userId,{name,email,role,phone},
+        {new:true,runValidators:true,select:"-password"}
+      )
+
+      if(!updatedUser){
+        return res.status(400).json({success:false,message:"User not found"})
+      }
+
+      return res.status(200).json({success:true,message:"User updated successfully",updatedUser})
+
+      
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({success:false,message:"Server not running"})
+    }
+  }
   
   export const logout = async(_,res)=>{
       try {
@@ -109,7 +151,13 @@ export const register = async (req, res) => {
         return res.status(400).json({message:"No user currently",success:false})
       }
 
-      return res.status(200).json({message:"All Users",success:true,users:otherUser})
+      console.log(userSocketMap,"Socket")
+      const userWithStatus = otherUser.map(user=>({
+        ...user.toObject(),
+        isOnline:!!userSocketMap[user._id.toString()]
+      }))
+
+      return res.status(200).json({message:"All Users",success:true,users:userWithStatus})
 
     } catch (error) {
       console.log(error)
