@@ -151,7 +151,7 @@ export const register = async (req, res) => {
         return res.status(400).json({message:"No user currently",success:false})
       }
 
-      console.log(userSocketMap,"Socket")
+      
       const userWithStatus = otherUser.map(user=>({
         ...user.toObject(),
         isOnline:!!userSocketMap[user._id.toString()]
