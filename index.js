@@ -4,7 +4,9 @@ import cookieParser from 'cookie-parser'
 import { app, server } from './socket/socket.js'
 import { connectToDB } from './utils/connectToDB.js'
 import userRoutes from './routes/userRoutes.js'
+import messageRoutes from './routes/messageRoutes.js'
 import dotenv from 'dotenv'
+
 
 dotenv.config()
 
@@ -22,6 +24,7 @@ const corsOptions = {
 app.use(cors(corsOptions))
 
 app.use('/api/v1/user',userRoutes)
+app.use('/api/v1/messages',messageRoutes)
 
 
 
