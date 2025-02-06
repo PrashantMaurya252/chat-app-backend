@@ -13,7 +13,9 @@ app.use(cookieParser())
 app.use(urlencoded({extended:true}))
 
 const corsOptions = {
-    origin:process.env.URL,
+    origin:process.env.URL || '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
     credentials:true
 }
 

@@ -81,6 +81,7 @@ export const register = async (req, res) => {
         .json({
           message: `Welcome back ${user.username}`,
           user,
+          token:token,
           success: true,
         });
     } catch (error) {
@@ -97,4 +98,21 @@ export const register = async (req, res) => {
       } catch (error) {
           console.log(error)
       }
+  }
+
+  export const getAllUsers = async(req,res)=>{
+    const userId = req.id
+    try {
+      const otherUser = await User.find({_id:{$ne:userId}}).select("_id name email role")
+
+      if(!otherUser || otherUser.length === 0){
+        return res.status(400).json({message:"No user currently",success:false})
+      }
+
+      return res.status(200).json({message:"All Users",success:true,users:otherUser})
+
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({message:"Internal Server Error",success:false})
+    }
   }
